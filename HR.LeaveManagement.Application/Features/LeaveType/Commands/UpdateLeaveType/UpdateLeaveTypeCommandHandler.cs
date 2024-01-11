@@ -25,6 +25,9 @@ namespace HR.LeaveManagement.Application.Features.LeaveType.Commands.UpdateLeave
             // validate incoming data
 
             // convert to domain entity type
+
+            // :: WRONG WAY TO UPDATE , We should pull entity from db and then update after making changed
+            // :: Like we are doing with Leave Allocation UPDATE handler
             var leaveTypeToUpdate = _mapper.Map<Domain.LeaveType>(request);
 
             // add to database
