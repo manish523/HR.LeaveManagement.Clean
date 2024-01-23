@@ -28,12 +28,11 @@ namespace HR.LeaveManagement.BlazorUI.Providers
             }
 
             var savedToken = await _localStorage.GetItemAsync<string>("token");
-            
+
             try
             {
-                IdentityModelEventSource.ShowPII = true;
                 var tokenContent = _jwtSecurityTokenHandler.ReadJwtToken(savedToken);
-                if (tokenContent.ValidTo < DateTime.Now)
+                if (tokenContent.ValidTo < DateTime.UtcNow)
                 {
                     await _localStorage.RemoveItemAsync("token");
                     return new AuthenticationState(user);
@@ -42,7 +41,7 @@ namespace HR.LeaveManagement.BlazorUI.Providers
             catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
 
             var claims = await GetClaims();

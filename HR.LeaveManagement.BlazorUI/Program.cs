@@ -35,5 +35,5 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 await builder.Build().RunAsync();
-var host = builder.Build();
-_ = new JwtPayload();
+//var host = builder.Build();
+//_ = new JwtPayload();

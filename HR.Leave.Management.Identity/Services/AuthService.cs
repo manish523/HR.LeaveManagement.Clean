@@ -81,7 +81,7 @@ namespace HR.Leave.Management.Identity.Services
             else
             {
                 StringBuilder stringBuilder = new StringBuilder();
-                foreach(var err in result.Errors)
+                foreach (var err in result.Errors)
                 {
                     stringBuilder.AppendFormat("•{0}\n", err.Description);
                 }
@@ -100,7 +100,7 @@ namespace HR.Leave.Management.Identity.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub,user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti,user.Email),
+                new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim("uid",user.Id),
             }
             .Union(userClaims)
@@ -110,11 +110,13 @@ namespace HR.Leave.Management.Identity.Services
 
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
+            // Check token expiration logic carefully
+            // If it's utc or datetime.now, same should match at client side as well for exoiration time to work properly
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(_jwtSettings.DurationInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
