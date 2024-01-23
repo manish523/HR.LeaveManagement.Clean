@@ -29,7 +29,7 @@ namespace HR.LeaveManagement.BlazorUI.Pages
         {
             if (await AuthenticationService.AuthenticateAsync(Model.Email, Model.Password))
             {
-                NavigationManager.NavigateTo("home");
+                NavigationManager.NavigateTo("/");
             }
         }
     }
