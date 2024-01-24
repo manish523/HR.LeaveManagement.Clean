@@ -1,6 +1,7 @@
 ﻿using HR.LeaveManagement.API.Models;
 using HR.LeaveManagement.Application.Exceptions;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace HR.LeaveManagement.API.Middleware
@@ -8,10 +9,12 @@ namespace HR.LeaveManagement.API.Middleware
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -65,6 +68,8 @@ namespace HR.LeaveManagement.API.Middleware
             }
 
             httpContext.Response.StatusCode = (int)statusCode;
+            var logMessage = JsonConvert.SerializeObject(problem);
+            _logger.LogError(logMessage);
             await httpContext.Response.WriteAsJsonAsync(problem);
         }
     }
