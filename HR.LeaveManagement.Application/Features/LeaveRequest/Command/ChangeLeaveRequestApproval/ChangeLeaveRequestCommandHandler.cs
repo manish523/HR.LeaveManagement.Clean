@@ -17,6 +17,7 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequest.Command.ChangeLea
     {
         private readonly ILeaveRequestRepository _leaveRequestRepository;
         private readonly ILeaveTypeRepository _leaveTypeRepository;
+        private readonly ILeaveAllocationRepository _leaveAllocationRepository;
         private readonly IMapper _mapper;
         private readonly IEmailSender _emailSender;
         private readonly IAppLogger<ChangeLeaveRequestCommandHandler> _logger;
@@ -24,12 +25,14 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequest.Command.ChangeLea
         public ChangeLeaveRequestCommandHandler(
             ILeaveRequestRepository leaveRequestRepository,
             ILeaveTypeRepository leaveTypeRepository,
+            ILeaveAllocationRepository leaveAllocationRepository,
             IMapper mapper,
             IEmailSender emailSender,
             IAppLogger<ChangeLeaveRequestCommandHandler> logger)
         {
             _leaveRequestRepository = leaveRequestRepository;
             _leaveTypeRepository = leaveTypeRepository;
+            _leaveAllocationRepository = leaveAllocationRepository;
             _mapper = mapper;
             _emailSender = emailSender;
             _logger = logger;
@@ -45,7 +48,16 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequest.Command.ChangeLea
             await _leaveRequestRepository.UpdateAsync(leaveRequest);
 
             // If request approved, get and update the employee's allocations
+            if (request.Approved)
+            {
+                int daysRequested = (int)(leaveRequest.EndDate - leaveRequest.StartDate).TotalDays;
+                var allocation = await _leaveAllocationRepository
+                    .GetUserAllocations(leaveRequest.RequestingEmployeeId, daysRequested);
 
+                allocation.NumberOfDays -= daysRequested;
+
+                await _leaveAllocationRepository.UpdateAsync(allocation);
+            }
 
             // Send confirmation email
             try

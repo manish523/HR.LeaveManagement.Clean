@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using HR.LeaveManagement.BlazorUI;
 using HR.LeaveManagement.BlazorUI.Contracts;
+using HR.LeaveManagement.BlazorUI.Handlers;
 using HR.LeaveManagement.BlazorUI.Providers;
 using HR.LeaveManagement.BlazorUI.Services;
 using HR.LeaveManagement.BlazorUI.Services.Base;
@@ -21,8 +22,10 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 //});
 
 // Microsoft.Extensions.Http
+builder.Services.AddTransient<JwtAuthorizationMessageHandler>();
 builder.Services.AddHttpClient<IClient, Client>(client => client.BaseAddress = new Uri
-("https://localhost:7084"));
+("https://localhost:7084"))
+    .AddHttpMessageHandler<JwtAuthorizationMessageHandler>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
